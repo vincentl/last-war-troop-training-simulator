@@ -33,6 +33,26 @@ st.title("📌 Bookmarkable Streamlit App")
 rate = st.text_input("Enter rate:", value=default_rate)
 goal = st.text_input("Enter goal:", value=default_goal)
 
+
+st.header("Dataset 1: Up to 4 Rows (Level & Capacity)")
+# Create a default DataFrame with 4 rows and two columns.
+default_df1 = pd.DataFrame({
+    "level": ["", "", "", ""],
+    "capacity": ["", "", "", ""]
+})
+# Using a fixed number of rows so users see exactly 4 rows.
+data1 = st.data_editor(default_df1, num_rows="fixed", key="dataset1")
+
+st.header("Dataset 2: 10 Rows (Count & Time)")
+# Create a DataFrame with an index from 10 down to 1.
+default_df2 = pd.DataFrame({
+    "count": ["" for _ in range(10)],
+    "time": ["" for _ in range(10)]
+}, index=list(range(10, 0, -1)))
+# Fixed rows so users can only edit the provided rows.
+data2 = st.data_editor(default_df2, num_rows="fixed", key="dataset2")
+
+
 if rate and goal:
     # Create the query string
     query_string = get_query_params_url(["rate", "goal"], {"rate": rate, "goal": goal})
