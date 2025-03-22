@@ -1,30 +1,60 @@
 import streamlit as st
+from urllib.parse import urlencode
 
-# Read query parameters from the URL
-params = st.experimental_get_query_params()
+def get_query_params_url(params_list, params_dict, **kwargs):
+    """
+    Generate a query string from selected parameters.
+    Produced by ChatGPT o3-mini-high based on https://discuss.streamlit.io/t/get-url-from-streamlit-app/33419/12
+
+    Args:
+        params_list (list): A list of parameter names to include.
+        params_dict (dict): A dictionary containing parameter values.
+        **kwargs: Additional parameters to include.
+    
+    Returns:
+        str: A query string starting with '?'.
+    """
+    # Merge params_dict with any additional keyword args
+    combined = {**params_dict, **kwargs}
+    # Only include keys specified in params_list
+    filtered = {k: v for k, v in combined.items() if k in params_list}
+    return "?" + urlencode(filtered, doseq=True)
+
+# Get default values from current query parameters (if available)
+params = st.query_params()
 default_rate = params.get("rate", [""])[0]
 default_goal = params.get("goal", [""])[0]
 
 st.title("📌 Bookmarkable Streamlit App")
 
-# Input fields
+# Input fields for rate and goal
 rate = st.text_input("Enter rate:", value=default_rate)
 goal = st.text_input("Enter goal:", value=default_goal)
 
 if rate and goal:
-    st.write(f"📈 **Rate**: {rate}")
-    st.write(f"🎯 **Goal**: {goal}")
+    st.write(f"**Rate:** {rate}")
+    st.write(f"**Goal:** {goal}")
 
-    # Build a bookmarkable URL
-    base_url = st.request.host_url.rstrip("/")
-    new_url = f"{base_url}/?rate={rate}&goal={goal}"
-
-    st.markdown("### 🔗 Shareable Link")
-    st.markdown(f"[Click here to bookmark this version]({new_url})", unsafe_allow_html=True)
-
-    # Open in new tab with a button
-    js = f"window.open('{new_url}', '_blank').focus();"
-    st.components.v1.html(f"<script>{js}</script>", height=0)
-    st.button("Open in New Tab", on_click=lambda: None)
+    # Create the query string using our function
+    query_string = get_query_params_url(["rate", "goal"], {"rate": rate, "goal": goal})
+    
+    st.markdown("### 🔗 Bookmarkable Link")
+    st.markdown(
+        "You can copy the following query string and append it to your app's URL, or click the button below to open the full URL in a new tab."
+    )
+    st.code(query_string, language="text")
+    
+    # Use JavaScript to build the full URL and open it in a new tab
+    js_code = f"""
+    <script>
+    const baseUrl = window.location.origin;
+    const path = window.location.pathname;
+    const queryString = "{query_string}";
+    const fullUrl = baseUrl + path + queryString;
+    window.open(fullUrl, "_blank").focus();
+    </script>
+    """
+    if st.button("Open Bookmarkable Link in New Tab"):
+        st.components.v1.html(js_code, height=0)
 else:
     st.info("Enter both a rate and a goal to generate a bookmarkable link.")
