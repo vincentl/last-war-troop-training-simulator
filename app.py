@@ -24,8 +24,8 @@ def get_query_params_url(params_list, params_dict, **kwargs):
 
 # Access query parameters (using the new API: st.query_params as a property)
 params = st.query_params  
-default_rate = params.get("rate", [""])[0]
-default_goal = params.get("goal", [""])[0]
+default_rate = params.get("rate", [""])
+default_goal = params.get("goal", [""])
 
 st.title("📌 Bookmarkable Streamlit App")
 
