@@ -1,3 +1,5 @@
+
+
 import streamlit as st
 from urllib.parse import urlencode
 
@@ -20,8 +22,8 @@ def get_query_params_url(params_list, params_dict, **kwargs):
     filtered = {k: v for k, v in combined.items() if k in params_list}
     return "?" + urlencode(filtered, doseq=True)
 
-# Get default values from current query parameters (if available)
-params = st.query_params()
+# Access query parameters (using the new API: st.query_params as a property)
+params = st.query_params  
 default_rate = params.get("rate", [""])[0]
 default_goal = params.get("goal", [""])[0]
 
@@ -35,26 +37,16 @@ if rate and goal:
     st.write(f"**Rate:** {rate}")
     st.write(f"**Goal:** {goal}")
 
-    # Create the query string using our function
+    # Create the query string
     query_string = get_query_params_url(["rate", "goal"], {"rate": rate, "goal": goal})
     
+    # Define your deployed app's base URL (update this accordingly)
+    base_url = "https://share.streamlit.io/your-username/your-repo/main"
+    full_url = base_url + "/" + query_string
+
     st.markdown("### 🔗 Bookmarkable Link")
-    st.markdown(
-        "You can copy the following query string and append it to your app's URL, or click the button below to open the full URL in a new tab."
-    )
-    st.code(query_string, language="text")
-    
-    # Use JavaScript to build the full URL and open it in a new tab
-    js_code = f"""
-    <script>
-    const baseUrl = window.location.origin;
-    const path = window.location.pathname;
-    const queryString = "{query_string}";
-    const fullUrl = baseUrl + path + queryString;
-    window.open(fullUrl, "_blank").focus();
-    </script>
-    """
-    if st.button("Open Bookmarkable Link in New Tab"):
-        st.components.v1.html(js_code, height=0)
+    st.markdown("Use the link below to bookmark or share this specific state:")
+    st.code(full_url, language="text")
+    st.markdown(f"[Open Bookmarkable Link]({full_url})")
 else:
     st.info("Enter both a rate and a goal to generate a bookmarkable link.")
