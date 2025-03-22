@@ -34,19 +34,17 @@ rate = st.text_input("Enter rate:", value=default_rate)
 goal = st.text_input("Enter goal:", value=default_goal)
 
 if rate and goal:
-    st.write(f"**Rate:** {rate}")
-    st.write(f"**Goal:** {goal}")
-
     # Create the query string
     query_string = get_query_params_url(["rate", "goal"], {"rate": rate, "goal": goal})
     
-    # Define your deployed app's base URL (update this accordingly)
-    base_url = "https://share.streamlit.io/your-username/your-repo/main"
-    full_url = base_url + "/" + query_string
-
     st.markdown("### 🔗 Bookmarkable Link")
-    st.markdown("Use the link below to bookmark or share this specific state:")
-    st.code(full_url, language="text")
-    st.markdown(f"[Open Bookmarkable Link]({full_url})")
+    st.markdown("You can copy the query string below and bookmark or share this specific state:")
+    st.code(query_string, language="text")
+    
+    # Using a relative link; when clicked, it reloads the current page with the new query parameters.
+    st.markdown(f"[Open Bookmarkable Link]({query_string})")
+
+    st.write(f"**Rate:** {rate}")
+    st.write(f"**Goal:** {goal}")
 else:
     st.info("Enter both a rate and a goal to generate a bookmarkable link.")
