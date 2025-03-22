@@ -1,6 +1,7 @@
 
 
 import streamlit as st
+import pandas as pd
 from urllib.parse import urlencode
 
 def get_query_params_url(params_list, params_dict, **kwargs):
