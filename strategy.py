@@ -128,11 +128,9 @@ def simulate(barracks: list[Barrack],
 
     now = 0
     while pipeline[-1] != goal:
-        print(pipeline)
         # I. retire completed activity
         if len(inflight):
             activity = heapq.heappop(inflight)
-            print('Finish', activity)
             pipeline[activity.level] += activity.count
             now = activity.finish
             heapq.heappush(idle, activity.resource)
@@ -147,7 +145,6 @@ def simulate(barracks: list[Barrack],
                 cost = promote(count, barrack.level - promote_from)
                 description = f'Barracks {barrack.index} - promote {count} troops from level {promote_from} to level {barrack.level} at cost {seconds_to_duration(cost)}'
                 activity = Activity(now + cost, now, description, barrack, count, barrack.level, cost)
-                print('Start', activity)
                 frames += [activity_to_frame(activity)]
                 heapq.heappush(inflight, activity)
             elif pipeline[0] > 0:
@@ -162,7 +159,6 @@ def simulate(barracks: list[Barrack],
                 cost = train(count, target_level)
                 description = f'Barracks {barrack.index} - train {count} troops at level {target_level} at cost {seconds_to_duration(cost)}'
                 activity = Activity(now + cost, now, description, barrack, count, target_level, cost)
-                print('Start', activity)
                 frames += [activity_to_frame(activity)]
                 heapq.heappush(inflight, activity)
             elif promote_from := next((level for level in range(1, barrack.level) if pipeline[level] > 0), None):
@@ -172,7 +168,6 @@ def simulate(barracks: list[Barrack],
                 cost = promote(count, barrack.level - promote_from)
                 description = f'Barracks {barrack.index} - promote {count} troops from level {promote_from} to level {barrack.level} at cost {seconds_to_duration(cost)}'
                 activity = Activity(now + cost, now, description, barrack, count, barrack.level, cost)
-                print('Start', activity)
                 frames += [activity_to_frame(activity)]
                 heapq.heappush(inflight, activity)
             else:
@@ -180,5 +175,4 @@ def simulate(barracks: list[Barrack],
                 heapq.heappush(skip, barrack)
         idle = skip
     total_barrack_time = sum(row['Duration'] for row in frames)
-    print(frames)
     return seconds_to_duration(now), pd.DataFrame(frames), seconds_to_duration(total_barrack_time)
